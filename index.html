@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#131715">
+  <meta name="description" content="Afinador de guitarra por microfone. Afinações alternativas, modo cromático e sons de referência. Sem bibliotecas externas.">
+  <title>Afina · Afinador de guitarra</title>
+  <style>
+    :root{color-scheme:dark;--bg:#131715;--surface:#1b211e;--surface2:#222a25;--line:#333e36;--text:#f0f0e6;--muted:#a7b1a8;--accent:#cef17b;--accent-ink:#202e10;--flat:#f1bb75;--sharp:#92c9e9;--good:#cef17b;--danger:#ffa49a;--shadow:0 18px 65px #0002;--radius:24px;--pointer:50%;--meter-color:var(--muted)}
+    [data-theme="light"]{color-scheme:light;--bg:#eeeee6;--surface:#fafaf3;--surface2:#e5e9de;--line:#d0d7c9;--text:#202920;--muted:#60715f;--accent:#b8dc68;--accent-ink:#263a0f;--flat:#a5621a;--sharp:#246c9e;--good:#47751a;--danger:#b5332d;--shadow:0 18px 65px #27381308}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;min-width:280px}button,input,select{font:inherit}button,a,input,select,summary{touch-action:manipulation}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}a{color:inherit}svg{display:block}button svg{width:20px;height:20px;flex-shrink:0}.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}[hidden]{display:none!important}
+    .shell{max-width:1232px;margin:auto;padding:28px 40px 30px}.topbar{display:flex;align-items:center;justify-content:space-between;padding-bottom:25px;border-bottom:1px solid var(--line);gap:16px}.brand{display:flex;align-items:center;gap:11px;text-decoration:none}.brand-symbol{height:34px;width:34px;display:flex;align-items:center;gap:4px;justify-content:center}.brand-symbol i{display:block;background:var(--accent);width:4px;border-radius:5px}.brand-symbol i:nth-child(1),.brand-symbol i:nth-child(5){height:13px}.brand-symbol i:nth-child(2),.brand-symbol i:nth-child(4){height:24px}.brand-symbol i:nth-child(3){height:34px}.wordmark{font-size:23px;letter-spacing:-1.3px;font-weight:850}.wordmark small{font-size:10px;display:block;letter-spacing:2.1px;color:var(--muted);font-weight:600;margin-top:-5px}.top-actions{display:flex;align-items:center;gap:9px}.icon-button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:12px;min-width:42px;height:42px;display:grid;place-items:center}.icon-button:hover{color:var(--text);background:var(--surface2)}.local-badge{color:var(--muted);font-size:12px;display:flex;align-items:center;gap:7px;margin-right:12px}.local-badge .icon{width:15px;height:15px}.intro{padding:30px 0 24px;display:flex;align-items:end;justify-content:space-between;gap:20px}.eyebrow{text-transform:uppercase;font-size:10px;letter-spacing:2.2px;font-weight:750;color:var(--muted);margin:0 0 6px}.intro h1{font-size:clamp(27px,3vw,38px);letter-spacing:-1.6px;line-height:1.12;margin:0;font-weight:750}.intro p.description{font-size:13px;color:var(--muted);margin:9px 0 0}.session-info{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;white-space:nowrap}.session-info .icon{width:15px;height:15px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 316px;gap:20px;align-items:start}.main-column{min-width:0}.card{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .tuner{padding:23px 26px 25px;overflow:hidden;position:relative}.card-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.segmented{display:inline-flex;padding:4px;border:1px solid var(--line);background:var(--bg);border-radius:12px;gap:3px}.segmented button{border:0;background:transparent;color:var(--muted);border-radius:8px;padding:7px 13px;font-size:12px;font-weight:650;min-height:34px}.segmented button[aria-pressed="true"]{background:var(--surface2);color:var(--text)}.mic-status{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:11px}.status-dot{width:6px;height:6px;background:var(--muted);border-radius:50%;flex-shrink:0}.mic-status.active .status-dot{background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 12%,transparent)}.mic-status.active{color:var(--accent)}
+    .note-stage{text-align:center;padding:26px 0 12px;position:relative}.string-tag{color:var(--muted);font-size:11px;letter-spacing:1.3px;text-transform:uppercase;min-height:20px}.note-line{display:flex;justify-content:center;align-items:center;min-height:137px;gap:5px}.note-name{font-size:115px;font-weight:780;letter-spacing:-8px;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--text)}.note-name.solfege{font-size:85px;letter-spacing:-5px}.note-octave{font-size:25px;align-self:center;color:var(--muted);padding-top:38px;font-weight:500}.note-description{color:var(--muted);font-size:13px;min-height:20px}.note-meta{display:flex;justify-content:center;align-items:center;gap:17px;flex-wrap:wrap;margin-top:10px;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}.note-meta strong{color:var(--text);font-size:12px;font-weight:600}.note-meta span+span{position:relative}.note-meta span+span:before{content:"";position:absolute;left:-9px;top:5px;width:1px;height:12px;background:var(--line)}
+    .meter{margin:28px 8px 0;position:relative}.meter-rail{height:37px;position:relative;display:flex;justify-content:space-between;align-items:center;isolation:isolate}.meter-rail:before{content:"";position:absolute;inset:15px 0;background:var(--line);border-radius:10px;z-index:-1}.meter-zone{position:absolute;left:45%;right:45%;height:36px;border-radius:6px;background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 27%,transparent);z-index:-1}.tick{width:1px;height:11px;background:var(--line)}.tick.major{height:18px;background:var(--muted);opacity:.5}.tick.center{height:27px;width:2px;background:var(--good);opacity:1}.needle{position:absolute;top:1px;left:var(--pointer);height:35px;width:4px;border-radius:5px;background:var(--meter-color);transform:translateX(-50%);transition:left .1s ease,background .2s;box-shadow:0 0 18px color-mix(in srgb,var(--meter-color) 18%,transparent);opacity:0}.needle.visible{opacity:1}.needle:before{content:"";position:absolute;top:-6px;left:-3px;border-top:5px solid var(--meter-color);border-left:5px solid transparent;border-right:5px solid transparent}.meter-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:4px}.meter-labels .zero{color:var(--good)}.reading{text-align:center;padding-top:16px;min-height:82px}.reading-title{font-size:17px;font-weight:650;display:flex;justify-content:center;align-items:center;gap:8px;min-height:26px}.cents{font-size:12px;font-variant-numeric:tabular-nums;font-weight:500;color:var(--muted)}.reading-hint{font-size:11px;color:var(--muted);margin:4px 0 0;min-height:17px}.listen-button{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;min-height:50px;border:0;border-radius:13px;background:var(--accent);color:var(--accent-ink);font-size:13px;font-weight:750;transition:filter .2s,transform .15s}.listen-button:hover{filter:brightness(1.05)}.listen-button:active{transform:translateY(1px)}.listen-button.is-listening{background:var(--surface2);color:var(--text);border:1px solid var(--line)}.permission-note{font-size:10px;text-align:center;color:var(--muted);margin:10px 0 0}
+    .strings-panel{margin-top:20px;padding:20px 21px 21px}.panel-header{display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:17px}.panel-title{font-size:13px;font-weight:650;margin:0}.panel-subtitle{font-size:11px;color:var(--muted);margin:3px 0 0}.text-button{padding:5px 0;background:none;border:0;color:var(--muted);font-size:10px;text-decoration:underline;text-underline-offset:3px;min-height:28px}.text-button:hover{color:var(--text)}.strings{display:grid;grid-template-columns:repeat(var(--strings,6),minmax(0,1fr));gap:7px}.string-button{position:relative;border:1px solid var(--line);border-radius:13px;background:var(--bg);color:var(--text);padding:12px 4px 10px;min-height:112px;transition:background .2s,border-color .2s;overflow:hidden}.string-button:hover{background:var(--surface2)}.string-button.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--bg))}.string-button .number{font-size:10px;color:var(--muted);display:block;margin-bottom:3px}.string-button .string-note{font-size:25px;font-weight:650;letter-spacing:-1px;line-height:1.3}.string-button .octave{font-size:11px;color:var(--muted);padding-left:1px}.string-button .hz{font-size:9px;color:var(--muted);display:block;margin-top:3px;white-space:nowrap}.string-check{font-size:9px;display:block;margin-top:5px;color:var(--muted);min-height:13px}.string-button.tuned .string-check{color:var(--good)}.string-button.tuned .string-check:before{content:"✓ ";font-weight:bold}.string-help{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:13px;font-size:10px;color:var(--muted)}.auto-button{border:1px solid var(--line);border-radius:7px;color:var(--muted);background:none;font-size:10px;font-weight:600;padding:5px 8px;min-height:31px;flex-shrink:0}.auto-button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.chromatic-guide{font-size:12px;color:var(--muted);padding:5px 0 10px;line-height:1.7}
+    .side-column{display:flex;flex-direction:column;gap:16px}.settings{padding:21px}.section-heading{font-size:13px;font-weight:650;display:flex;align-items:center;gap:9px;margin:0 0 18px}.section-heading .icon{color:var(--muted);width:17px;height:17px}.field{display:block;margin-top:15px}.field:first-of-type{margin-top:0}.field-label{font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:6px}.field-label strong{font-weight:500;color:var(--text)}select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:9px;min-height:40px;width:100%;padding:9px 11px;font-size:12px;max-width:100%}select{padding-right:27px;text-overflow:ellipsis}.inline-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stepper{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--bg);height:40px}.stepper button{color:var(--muted);border:0;background:transparent;font-size:16px;min-width:32px}.stepper button:hover{background:var(--surface2)}.stepper input{border:0;border-radius:0;text-align:center;padding:0;width:100%;min-width:0;-moz-appearance:textfield}.stepper input::-webkit-inner-spin-button,.stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.divider{border:0;border-top:1px solid var(--line);margin:18px 0}.switch-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;cursor:pointer;margin:12px 0}.switch-row span small{display:block;font-size:9px;color:var(--muted);margin-top:2px}.switch{appearance:none;-webkit-appearance:none;width:32px;height:19px;border:1px solid var(--line);border-radius:15px;background:var(--bg);position:relative;cursor:pointer;margin:0;flex-shrink:0}.switch:before{content:"";height:13px;width:13px;border-radius:50%;position:absolute;left:2px;top:2px;background:var(--muted);transition:transform .18s}.switch:checked{background:var(--accent);border-color:var(--accent)}.switch:checked:before{background:var(--accent-ink);transform:translateX(13px)}.switch:disabled{opacity:.4;cursor:not-allowed}details.advanced{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}details.advanced summary{cursor:pointer;color:var(--muted);font-size:10px;padding:4px 0;min-height:28px}details.advanced[open] summary{margin-bottom:10px}.custom-editor{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:11px}.custom-editor label{font-size:9px;color:var(--muted)}.custom-editor select{margin-top:4px;padding:6px;font-size:11px;min-height:35px}.range{accent-color:var(--accent);width:100%;margin:5px 0 0;cursor:pointer;min-height:22px}
+    .reference{padding:19px 21px}.reference .section-heading{margin-bottom:12px}.reference-info{display:flex;align-items:center;gap:12px}.tone-button{height:43px;width:43px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--accent);background:var(--bg);flex-shrink:0}.tone-button:hover,.tone-button.playing{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}.reference-target{font-size:13px;font-weight:650}.reference-target small{display:block;font-size:10px;color:var(--muted);font-weight:400}.reference .field{margin-top:12px}.reference .switch-row{margin-bottom:0}.signal{margin-top:20px;display:flex;align-items:center;gap:12px;padding:14px 20px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}.signal canvas{height:29px;width:100%;min-width:0;flex:1;display:block}.signal-label{font-size:9px;color:var(--muted);white-space:nowrap;min-width:80px}.signal-label strong{display:block;font-size:10px;color:var(--text);font-variant-numeric:tabular-nums;font-weight:500}.confidence{font-size:9px;color:var(--muted);text-align:right;min-width:67px;white-space:nowrap}.confidence strong{display:block;font-size:10px;color:var(--text);font-weight:500}.notice{margin-bottom:17px;border:1px solid color-mix(in srgb,var(--flat) 40%,var(--line));background:color-mix(in srgb,var(--flat) 7%,var(--surface));border-radius:13px;padding:13px 15px;color:var(--text);font-size:12px;display:flex;gap:10px;align-items:start}.notice .icon{flex-shrink:0;color:var(--flat);width:18px;height:18px}.notice p{margin:0}.footer{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-top:27px;color:var(--muted);font-size:10px}.footer .icon{width:12px;height:12px}.privacy{display:flex;gap:6px;align-items:center}.footer button{min-height:30px}.progress-track{height:3px;width:62px;background:var(--line);border-radius:8px;overflow:hidden}.progress-fill{height:100%;width:0;background:var(--accent);transition:width .4s}
+    dialog{width:min(560px,calc(100% - 30px));max-height:85dvh;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:22px;padding:25px;box-shadow:0 35px 150px #0006}dialog::backdrop{background:#050a08b3;backdrop-filter:blur(5px)}.dialog-header{display:flex;justify-content:space-between;align-items:center;gap:15px}.dialog-header h2{font-size:21px;letter-spacing:-.7px;margin:0}dialog p,dialog li{font-size:12px;color:var(--muted);line-height:1.8}dialog ol{padding-left:20px}dialog h3{font-size:13px;margin:19px 0 5px}dialog p{margin:7px 0}dialog strong{color:var(--text)}dialog code{font-size:11px;background:var(--bg);padding:3px 5px;border-radius:4px}.key{font-size:10px;display:inline-block;border:1px solid var(--line);border-radius:4px;padding:1px 6px;background:var(--bg)}.toast{position:fixed;bottom:max(22px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 17px;border-radius:11px;max-width:calc(100% - 30px);font-size:12px;box-shadow:0 8px 40px #0004;z-index:20;text-align:center}
+    @media(min-width:1100px){.note-stage{padding-top:29px}.note-line{min-height:145px}.note-name{font-size:123px}.tuner{padding-bottom:27px}}
+    @media(max-width:980px){.shell{padding:24px}.layout{grid-template-columns:minmax(0,1fr) 282px;gap:16px}.tuner{padding:21px}.strings-panel{padding:18px 16px}.string-button .string-note{font-size:22px}.string-button .hz{font-size:8px}.note-name{font-size:104px}.note-line{min-height:125px}.local-badge{display:none}.side-column{gap:16px}.settings,.reference{padding:19px}.segmented button{padding:7px 10px}}
+    @media(max-width:760px){.shell{max-width:650px;padding:20px 18px 23px}.topbar{padding-bottom:18px}.intro{padding:24px 0 20px}.intro h1{font-size:30px}.layout{grid-template-columns:1fr;gap:17px}.session-info{font-size:10px}.session-info .icon{display:none}.tuner{padding:20px 22px}.note-stage{padding-top:25px}.note-line{min-height:128px}.note-name{font-size:112px}.side-column{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:15px}.strings-panel{margin-top:17px;padding:18px}.strings{gap:8px}.signal{margin-top:17px}.footer{margin-top:21px}.note-meta{gap:16px}.card{border-radius:20px}.reference{padding:19px}.settings{padding:19px}.strings-panel .panel-subtitle{font-size:10px}.string-button .hz{font-size:9px}}
+    @media(max-width:480px){.shell{padding:17px 13px 20px}.wordmark{font-size:21px}.wordmark small{font-size:9px}.brand-symbol{height:31px;width:31px}.intro{align-items:start}.intro h1{font-size:29px}.intro p.description{font-size:12px}.session-info{font-size:10px;padding-top:5px;max-width:77px;white-space:normal;flex-wrap:wrap;justify-content:end;gap:4px}.progress-track{width:52px}.card-top{gap:8px}.segmented button{padding:7px 11px;font-size:11px}.mic-status{font-size:10px}.tuner{padding:18px 18px 21px}.note-stage{padding-top:22px}.note-line{min-height:124px}.note-name{font-size:108px}.note-name.solfege{font-size:77px}.note-meta{font-size:10px;gap:16px}.note-meta strong{font-size:11px}.meter{margin:24px 5px 0}.reading{padding-top:15px;min-height:81px}.strings{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.string-button{min-height:85px;padding:9px 5px 8px}.string-button .number{margin:0;font-size:9px}.string-button .string-note{font-size:24px}.string-check{margin-top:2px;font-size:8px}.string-button .hz{font-size:8px;margin-top:0}.side-column{grid-template-columns:1fr;gap:15px}.settings,.reference{padding:20px}.settings .inline-fields{gap:14px}.field{margin-top:15px}.reference-info{gap:13px}.reference .field{margin-top:14px}.footer{align-items:start;font-size:9px}.privacy{align-items:start;max-width:210px}.privacy .icon{flex-shrink:0;margin-top:2px}.signal{padding:12px 15px;gap:9px}.signal-label{min-width:63px}.confidence{min-width:56px}.panel-title{font-size:12px}.string-help{font-size:9px}.permission-note{font-size:9px}.reading-title{font-size:16px}.reading-hint{font-size:10px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+  </style>
+</head>
+<body>
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 .5c0 1.5-2.5 2-2.5 3.5M12 17h.01"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 13.2A8.5 8.5 0 0 1 10.8 3.5a8.5 8.5 0 1 0 9.7 9.7Z"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h5M14 7h6M4 17h10M19 17h1"/><circle cx="11.5" cy="7" r="2.5"/><circle cx="16.5" cy="17" r="2.5"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 4 5 9H2v6h3l6 5V4ZM15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m12 3 10 18H2L12 3ZM12 9v5M12 17h.01"/></symbol>
+  </svg>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#main" aria-label="Afina, afinador de guitarra"><span class="brand-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="wordmark">afina<span aria-hidden="true">.</span><small>SEU SOM, NO PONTO</small></span></a>
+      <div class="top-actions"><span class="local-badge"><svg class="icon"><use href="#i-lock"/></svg> Áudio só no seu dispositivo</span><button id="themeButton" class="icon-button" type="button" aria-label="Usar tema claro" title="Alternar tema"><svg class="icon"><use href="#i-sun"/></svg></button><button id="helpButton" class="icon-button" type="button" aria-label="Como usar o afinador" title="Como usar"><svg class="icon"><use href="#i-help"/></svg></button></div>
+    </header>
+    <div class="intro"><div><p class="eyebrow">FERRAMENTA PARA O SEU SOM</p><h1>Encontre seu tom.</h1><p class="description">Uma corda por vez. O resto, a gente escuta.</p></div><div class="session-info" id="sessionInfo"><svg class="icon"><use href="#i-check"/></svg><span id="sessionCount">0 de 6 afinadas</span><div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div></div></div>
+    <main id="main">
+      <div id="notice" class="notice" role="alert" hidden><svg class="icon"><use href="#i-alert"/></svg><p id="noticeText"></p></div>
+      <div class="layout">
+        <div class="main-column">
+          <section class="card tuner" aria-label="Afinador">
+            <div class="card-top"><div class="segmented" role="group" aria-label="Modo de afinação"><button type="button" id="modeStrings" aria-pressed="true">Por corda</button><button type="button" id="modeChromatic" aria-pressed="false">Cromático</button></div><div class="mic-status" id="micStatus"><span class="status-dot"></span><span id="micStatusText">Microfone desligado</span></div></div>
+            <div class="note-stage"><div class="string-tag" id="stringTag">PRONTO PARA O SEU SOM</div><div class="note-line"><span class="note-name" id="noteName">—</span><span class="note-octave" id="noteOctave"></span></div><div class="note-description" id="noteDescription">Toque uma corda solta para começar</div><div class="note-meta"><span>Lida <strong id="frequency">— Hz</strong></span><span>Alvo <strong id="targetFrequency">— Hz</strong></span><span>A4 <strong id="calibrationLabel">440 Hz</strong></span></div></div>
+            <div class="meter" id="meter" role="meter" aria-label="Desvio da afinação em cents" aria-valuemin="-50" aria-valuemax="50" aria-valuenow="0" aria-valuetext="Aguardando uma nota">
+              <div class="meter-rail"><div class="meter-zone" id="meterZone"></div><span class="tick major"></span><span class="tick"></span><span class="tick"></span><span class="tick"></span><span class="tick"></span><span class="tick center"></span><span class="tick"></span><span class="tick"></span><span class="tick"></span><span class="tick"></span><span class="tick major"></span><div class="needle" id="needle"></div></div><div class="meter-labels"><span>−50</span><span>−25</span><span class="zero">0</span><span>+25</span><span>+50 ct</span></div>
+            </div>
+            <div class="reading"><div class="reading-title"><span id="readingTitle">Vamos afinar?</span><span class="cents" id="cents"></span></div><p class="reading-hint" id="readingHint">Ative o microfone e toque uma corda por vez.</p></div>
+            <button type="button" class="listen-button" id="micButton"><svg class="icon"><use id="micButtonIcon" href="#i-mic"/></svg><span id="micButtonText">Ativar microfone</span></button>
+            <p class="permission-note" id="permissionNote">Você escolhe quando o microfone fica ligado.</p>
+          </section>
+          <section class="card strings-panel" aria-labelledby="stringsHeading">
+            <div class="panel-header"><div><h2 class="panel-title" id="stringsHeading">Suas cordas</h2><p class="panel-subtitle" id="tuningSubtitle">Padrão · da mais grave para a mais aguda</p></div><button type="button" class="text-button" id="resetSession">Nova sessão</button></div>
+            <div id="strings" class="strings"></div>
+            <div class="string-help" id="stringHelp"><span>Toque num cartão para fixar a corda.</span><button class="auto-button" id="autoButton" type="button" aria-pressed="true">Automático</button></div>
+            <p id="chromaticGuide" class="chromatic-guide" hidden>O modo cromático reconhece a nota mais próxima, incluindo sustenidos e bemóis. Para conferir a oitava e a afinação da corda solta, use o modo por corda.</p>
+          </section>
+          <div class="signal" aria-label="Monitor de sinal"><div class="signal-label">Nível de entrada<strong id="signalLevel">— dB</strong></div><canvas id="waveform" aria-hidden="true"></canvas><div class="confidence">Clareza<strong id="confidenceValue">—</strong></div></div>
+        </div>
+        <aside class="side-column" aria-label="Configurações do afinador">
+          <section class="card settings"><h2 class="section-heading"><svg class="icon"><use href="#i-sliders"/></svg>Do seu jeito</h2>
+            <label class="field"><span class="field-label">Instrumento</span><select id="instrument"><option value="guitar6">Guitarra / violão · 6 cordas</option><option value="guitar7">Guitarra · 7 cordas</option><option value="bass4">Baixo · 4 cordas</option><option value="bass5">Baixo · 5 cordas</option></select></label>
+            <label class="field"><span class="field-label">Afinação</span><select id="tuning"></select></label>
+            <div id="customEditor" class="custom-editor" hidden></div>
+            <div class="inline-fields"><label class="field"><span class="field-label">Referência A4 (Hz)</span><span class="stepper"><button type="button" id="calibrationDown" aria-label="Diminuir referência A4">−</button><input id="calibration" type="number" inputmode="decimal" min="430" max="450" step="0.1" value="440" aria-label="Frequência da nota Lá4 em hertz"><button type="button" id="calibrationUp" aria-label="Aumentar referência A4">+</button></span></label><label class="field"><span class="field-label">Precisão</span><select id="tolerance"><option value="2">±2 cents</option><option value="5" selected>±5 cents</option><option value="10">±10 cents</option></select></label></div>
+            <hr class="divider"><label class="switch-row"><span>Vibrar ao afinar<small id="hapticHint">Um toque quando chegar no ponto</small></span><input class="switch" id="haptic" type="checkbox"></label><label class="switch-row"><span>Manter tela acesa<small id="wakeHint">Enquanto o microfone estiver ligado</small></span><input class="switch" id="wakeLock" type="checkbox" checked></label>
+            <details class="advanced"><summary>Mais ajustes</summary>
+              <label class="field"><span class="field-label">Microfone</span><select id="inputDevice" disabled><option value="">Padrão do dispositivo</option></select></label>
+              <label class="field"><span class="field-label">Ignorar sons abaixo de <strong id="noiseLabel">−48 dB</strong></span><input class="range" type="range" id="noiseFloor" min="-65" max="-25" step="1" value="-48"><span class="field-label" style="margin:0"><span>Mais sensível</span><span>Menos ruído</span></span></label>
+              <div class="inline-fields"><label class="field"><span class="field-label">Nome das notas</span><select id="notation"><option value="letters">E, A, D…</option><option value="solfege">Mi, Lá, Ré…</option></select></label><label class="field"><span class="field-label">Acidentes</span><select id="accidental"><option value="sharp">Sustenidos (♯)</option><option value="flat">Bemóis (♭)</option></select></label></div>
+              <button class="text-button" id="resetSettings" type="button" style="margin-top:12px">Restaurar ajustes padrão</button>
+            </details>
+          </section>
+          <section class="card reference"><h2 class="section-heading"><svg class="icon"><use href="#i-volume"/></svg>Som de referência</h2><div class="reference-info"><button type="button" id="toneButton" class="tone-button" aria-label="Ouvir nota de referência" aria-pressed="false"><svg class="icon"><use id="toneIcon" href="#i-play"/></svg></button><div class="reference-target"><span id="referenceName">E2 · Mi</span><small id="referenceHz">82,41 Hz · corda 6</small></div></div><label class="field"><span class="field-label">Volume <strong id="volumeLabel">30%</strong></span><input class="range" type="range" id="volume" min="0" max="70" step="1" value="30"></label><label class="switch-row"><span>Som contínuo</span><input type="checkbox" class="switch" id="continuousTone"></label><p class="panel-subtitle" style="margin-top:10px">A leitura pausa enquanto a referência toca.</p></section>
+        </aside>
+      </div>
+    </main>
+    <footer class="footer"><span class="privacy"><svg class="icon"><use href="#i-lock"/></svg>Sem gravação ou envio de áudio.</span><button type="button" class="text-button" id="footerHelp">Como usar e atalhos</button></footer>
+  </div>
+  <dialog id="helpDialog" aria-labelledby="helpTitle"><div class="dialog-header"><h2 id="helpTitle">Um minuto, seis cordas.</h2><button type="button" class="icon-button" id="closeHelp" aria-label="Fechar ajuda"><svg class="icon"><use href="#i-x"/></svg></button></div><ol><li>Escolha o instrumento e a afinação. O padrão para guitarra é <strong>E2, A2, D3, G3, B3, E4</strong>.</li><li>Toque em <strong>Ativar microfone</strong> e permita o acesso no navegador.</li><li>Toque uma corda solta, sem efeitos. Abafe as outras e deixe a nota soar. Aproxime o microfone se o sinal estiver baixo.</li><li>Se estiver abaixo do alvo, aperte a tarraxa aos poucos. Se estiver acima, solte. Quando a leitura ficar verde e dentro da tolerância, ela está no ponto.</li></ol><h3>Automático ou uma corda específica?</h3><p>O automático escolhe a corda mais próxima do som detectado. Se a corda estiver muito desafinada, selecione o cartão dela para fixar o alvo. A oitava também é conferida: <strong>E2 e E3 são notas diferentes.</strong> Confira a nota indicada antes de aumentar muito a tensão da corda.</p><h3>O que são cents?</h3><p>Um semitom tem 100 cents. O centro é a frequência desejada. A tolerância define a faixa verde; ±5 cents é um bom ponto de partida. Os cartões ficam marcados depois de uma leitura estável, mas vale conferir novamente ao terminar.</p><h3>Microfone e compatibilidade</h3><p>Publique este único arquivo em <strong>HTTPS</strong> ou use <code>localhost</code>. Um endereço HTTP comum não libera o microfone. Abrir o arquivo diretamente pode funcionar em alguns navegadores; no celular, prefira HTTPS. Se estiver dentro de outro aplicativo ou de uma prévia, abra a página diretamente no Chrome, Edge, Firefox ou Safari.</p><p>Se o acesso estiver bloqueado, ajuste a permissão de microfone nas configurações do site. Alguns aparelhos aplicam processamento ao som mesmo quando pedimos para desativá-lo. Evite ruído, distorção e tocar várias cordas juntas.</p><h3>Referência, tela e privacidade</h3><p>O som de referência ajuda a comparar de ouvido e pausa a detecção para evitar realimentação. Ao trocar de aba ou bloquear a tela, o afinador desliga o microfone. Volte e ative de novo. A opção de manter a tela acesa depende do navegador. Seus ajustes ficam salvos neste navegador; seu áudio não é gravado nem enviado.</p><h3>Atalhos no computador</h3><p><span class="key">Espaço</span> liga / desliga o microfone · <span class="key">R</span> toca / para a referência · <span class="key">←</span> <span class="key">→</span> escolhem uma corda · <span class="key">Esc</span> para o som.</p></dialog>
+  <div class="toast" id="toast" role="status" hidden></div><div class="sr-only" id="liveStatus" role="status" aria-live="polite" aria-atomic="true"></div>
+  <script>
+  'use strict';
+  // Tudo funciona localmente: DOM, Web Audio e um Worker criado a partir deste arquivo.
+  // O detector YIN usa diferenças normalizadas, interpolação e redução de amostragem.
+  class PitchDetector {
+    constructor(){this.samples=new Float32Array(4096);this.yin=new Float32Array(2048);}
+    detect(input,sampleRate,minFrequency=25,maxFrequency=1500){
+      const stride=Math.max(1,Math.floor(sampleRate/12000));
+      const rate=sampleRate/stride;
+      const count=Math.min(this.samples.length,Math.floor(input.length/stride));
+      const x=this.samples;let mean=0,power=0;
+      for(let i=0;i<count;i++){let sum=0;for(let k=0;k<stride;k++)sum+=input[i*stride+k];x[i]=sum/stride;mean+=x[i];}
+      mean/=count;
+      for(let i=0;i<count;i++){x[i]-=mean;power+=x[i]*x[i];}
+      const rms=Math.sqrt(power/count);
+      if(rms<0.0005)return{frequency:null,confidence:0,rms};
+      const maxTau=Math.min(Math.ceil(rate/minFrequency),Math.floor(count/2)-1,this.yin.length-2);
+      const minTau=Math.max(2,Math.floor(rate/maxFrequency));
+      const windowSize=Math.min(1024,count-maxTau);
+      const yin=this.yin;yin[0]=1;let running=0;
+      for(let tau=1;tau<=maxTau;tau++){
+        let difference=0;
+        for(let i=0;i<windowSize;i++){const delta=x[i]-x[i+tau];difference+=delta*delta;}
+        running+=difference;yin[tau]=running?difference*tau/running:1;
+      }
+      let tau=-1;
+      for(let i=minTau;i<maxTau;i++){
+        if(yin[i]<0.15){while(i+1<=maxTau&&yin[i+1]<yin[i])i++;tau=i;break;}
+      }
+      if(tau<0){let minimum=1;for(let i=minTau;i<=maxTau;i++)if(yin[i]<minimum){minimum=yin[i];tau=i;}if(minimum>0.22)return{frequency:null,confidence:1-minimum,rms};}
+      // Refina no áudio original para preservar a precisão nas notas agudas.
+      // A correlação normalizada evita desvio causado pelo decaimento da corda.
+      const refine=approximate=>{
+        const center=Math.round(approximate*stride),radius=stride*2+1;
+        const first=Math.max(2,center-radius),last=Math.min(input.length-128,center+radius);
+        const size=Math.min(4096,input.length-last);let sumA=0,powerA=0;
+        for(let i=0;i<size;i++){sumA+=input[i];powerA+=input[i]*input[i];}
+        const varianceA=powerA-sumA*sumA/size;
+        const correlation=[];let peak=-1,best=first;
+        for(let lag=first;lag<=last;lag++){
+          let sumB=0,powerB=0,cross=0;
+          for(let i=0;i<size;i++){const b=input[i+lag];sumB+=b;powerB+=b*b;cross+=input[i]*b;}
+          const denominator=Math.sqrt(Math.max(1e-20,varianceA*(powerB-sumB*sumB/size)));
+          const value=(cross-sumA*sumB/size)/denominator;correlation.push(value);
+          if(value>peak){peak=value;best=lag;}
+        }
+        const index=best-first;
+        if(index===0||index===correlation.length-1)return{period:best,quality:peak};
+        const left=correlation[index-1],middle=correlation[index],right=correlation[index+1];
+        const divisor=left-2*middle+right;
+        const offset=divisor?clampOffset(0.5*(left-right)/divisor):0;
+        return{period:best+offset,quality:Math.min(1,middle-(left-right)*offset/4)};
+      };
+      const clampOffset=value=>Math.max(-1,Math.min(1,value));
+      let refined=refine(tau);
+      // Só corrige uma oitava quando o período duplo explica melhor o sinal.
+      // Assim, harmônicas fortes não confundem notas já periódicas e precisas.
+      if(refined.quality<0.99&&tau*2<maxTau){const doubled=refine(tau*2);if(doubled.quality>refined.quality+0.012)refined=doubled;}
+      const frequency=sampleRate/refined.period;
+      return{frequency:frequency>=minFrequency&&frequency<=maxFrequency?frequency:null,confidence:Math.max(0,Math.min(1,refined.quality)),rms};
+    }
+  }
+
+  const PRESETS={
+    guitar6:[
+      {id:'standard',name:'Padrão · E A D G B E',notes:[40,45,50,55,59,64]},
+      {id:'dropd',name:'Drop D · D A D G B E',notes:[38,45,50,55,59,64]},
+      {id:'eb',name:'Meio tom abaixo · E♭',notes:[39,44,49,54,58,63]},
+      {id:'dstandard',name:'Um tom abaixo · D padrão',notes:[38,43,48,53,57,62]},
+      {id:'dropc',name:'Drop C · C G C F A D',notes:[36,43,48,53,57,62]},
+      {id:'cstandard',name:'C padrão · C F B♭ E♭ G C',notes:[36,41,46,51,55,60]},
+      {id:'dropb',name:'Drop B · B F♯ B E G♯ C♯',notes:[35,42,47,52,56,61]},
+      {id:'dadgad',name:'DADGAD · D A D G A D',notes:[38,45,50,55,57,62]},
+      {id:'openg',name:'Open G · D G D G B D',notes:[38,43,50,55,59,62]},
+      {id:'opend',name:'Open D · D A D F♯ A D',notes:[38,45,50,54,57,62]},
+      {id:'opene',name:'Open E · E B E G♯ B E',notes:[40,47,52,56,59,64]}
+    ],
+    guitar7:[{id:'standard',name:'Padrão · B E A D G B E',notes:[35,40,45,50,55,59,64]},{id:'dropa',name:'Drop A · A E A D G B E',notes:[33,40,45,50,55,59,64]},{id:'eb',name:'Meio tom abaixo',notes:[34,39,44,49,54,58,63]}],
+    bass4:[{id:'standard',name:'Padrão · E A D G',notes:[28,33,38,43]},{id:'dropd',name:'Drop D · D A D G',notes:[26,33,38,43]},{id:'eb',name:'Meio tom abaixo',notes:[27,32,37,42]}],
+    bass5:[{id:'standard',name:'Padrão · B E A D G',notes:[23,28,33,38,43]},{id:'dropa',name:'Drop A · A E A D G',notes:[21,28,33,38,43]}]
+  };
+  const DEFAULTS={instrument:'guitar6',tuning:'standard',calibration:440,tolerance:5,noiseFloor:-48,notation:'letters',accidental:'sharp',theme:'dark',haptic:false,wakeLock:true,volume:30,continuousTone:false,mode:'strings',custom:{}};
+  const LETTERS_SHARP=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+  const LETTERS_FLAT=['C','D♭','D','E♭','E','F','G♭','G','A♭','A','B♭','B'];
+  const SOLFEGE_SHARP=['Dó','Dó♯','Ré','Ré♯','Mi','Fá','Fá♯','Sol','Sol♯','Lá','Lá♯','Si'];
+  const SOLFEGE_FLAT=['Dó','Ré♭','Ré','Mi♭','Mi','Fá','Sol♭','Sol','Lá♭','Lá','Si♭','Si'];
+  const $=id=>document.getElementById(id);
+  const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+  const format=(value,decimals=2)=>Number(value).toLocaleString('pt-BR',{minimumFractionDigits:decimals,maximumFractionDigits:decimals});
+  const midiFrequency=(midi,a4=state.calibration)=>a4*Math.pow(2,(midi-69)/12);
+  const frequencyMidi=(frequency,a4=state.calibration)=>69+12*Math.log2(frequency/a4);
+  const deviation=(frequency,midi)=>1200*Math.log2(frequency/midiFrequency(midi));
+  const noteParts=(midi,notation=state.notation)=>{const pc=((midi%12)+12)%12;const flat=state.accidental==='flat';return{name:(notation==='letters'?(flat?LETTERS_FLAT:LETTERS_SHARP):(flat?SOLFEGE_FLAT:SOLFEGE_SHARP))[pc],octave:Math.floor(midi/12)-1,solfege:(flat?SOLFEGE_FLAT:SOLFEGE_SHARP)[pc]};};
+  let state=readSettings();
+  let notes=[],selectedString=null,referenceIndex=0,referenceMidi=40,tuned=new Set();
+  let audio=null,stream=null,source=null,analyser=null,silentOutput=null,frame=new Float32Array(8192);
+  let active=false,starting=false,micEpoch=0,rafId=0,lastAnalysis=0,worker=null,workerBusy=false;
+  let detector=new PitchDetector(),frequencyHistory=[],lastDetectedMidi=null,lastReading=null,lastValidTime=0,stableSince=0,stableIndex=null,hapticSent=false;
+  let tone=null,toneUntil=0,referenceEpoch=0,referenceStarting=false,screenLock=null,wakeRequest=0,toastTimer=0,announced='',lastSpeechTime=0;
+  let canvasContext=null,canvasWidth=0,canvasHeight=0,lastSignalDb=-90;
+
+  function readSettings(){
+    let saved={};try{saved=JSON.parse(localStorage.getItem('afina.settings.v1')||'{}')||{};}catch(e){}
+    const value={...DEFAULTS,...saved};
+    if(!Object.prototype.hasOwnProperty.call(PRESETS,value.instrument))value.instrument='guitar6';
+    if(value.tuning!=='custom'&&!PRESETS[value.instrument].some(p=>p.id===value.tuning))value.tuning='standard';
+    for(const [key,min,max] of [['calibration',430,450],['noiseFloor',-65,-25],['volume',0,70]])value[key]=Number.isFinite(Number(value[key]))?clamp(Number(value[key]),min,max):DEFAULTS[key];
+    if(![2,5,10].includes(Number(value.tolerance)))value.tolerance=5;else value.tolerance=Number(value.tolerance);
+    for(const [key,options] of [['notation',['letters','solfege']],['accidental',['sharp','flat']],['theme',['dark','light']],['mode',['strings','chromatic']]])if(!options.includes(value[key]))value[key]=DEFAULTS[key];
+    for(const key of ['haptic','wakeLock','continuousTone'])value[key]=typeof value[key]==='boolean'?value[key]:DEFAULTS[key];
+    const custom={};
+    if(value.custom&&typeof value.custom==='object')for(const key of Object.keys(PRESETS)){const list=value.custom[key];if(Array.isArray(list)&&list.length===PRESETS[key][0].notes.length&&list.every(n=>Number.isInteger(n)&&n>=21&&n<=76))custom[key]=list.slice();}
+    value.custom=custom;return value;
+  }
+  function saveSettings(){try{localStorage.setItem('afina.settings.v1',JSON.stringify(state));}catch(e){}}
+  function setNotice(message){$('noticeText').textContent=message||'';$('notice').hidden=!message;}
+  function toast(message){clearTimeout(toastTimer);$('toast').textContent=message;$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,3500);}
+  function announce(message){const now=performance.now();if(message!==announced&&now-lastSpeechTime>900){$('liveStatus').textContent=message;announced=message;lastSpeechTime=now;}}
+  function applyTheme(){document.documentElement.dataset.theme=state.theme;document.querySelector('meta[name="theme-color"]').content=state.theme==='dark'?'#131715':'#eeeee6';$('themeButton').querySelector('use').setAttribute('href',state.theme==='dark'?'#i-sun':'#i-moon');$('themeButton').setAttribute('aria-label',state.theme==='dark'?'Usar tema claro':'Usar tema escuro');drawWaveform();}
+  function initializeControls(){
+    for(const id of ['instrument','calibration','tolerance','noiseFloor','notation','accidental','volume'])$(id).value=String(state[id]);
+    for(const id of ['haptic','wakeLock','continuousTone'])$(id).checked=state[id];
+    if(!('vibrate' in navigator)){$('haptic').disabled=true;$('hapticHint').textContent='Indisponível neste navegador';}
+    if(!('wakeLock' in navigator)){$('wakeLock').disabled=true;$('wakeHint').textContent='Indisponível neste navegador';}
+    $('noiseLabel').textContent=state.noiseFloor+' dB';$('volumeLabel').textContent=state.volume+'%';$('calibrationLabel').textContent=format(state.calibration,state.calibration%1?1:0)+' Hz';
+    applyTheme();renderTunings();renderMode();
+  }
+  function renderTunings(){
+    const select=$('tuning');select.replaceChildren();
+    for(const preset of PRESETS[state.instrument]){const option=document.createElement('option');option.value=preset.id;option.textContent=preset.name;select.append(option);}
+    const custom=document.createElement('option');custom.value='custom';custom.textContent='Personalizada';select.append(custom);select.value=state.tuning;
+    const preset=PRESETS[state.instrument].find(p=>p.id===state.tuning);
+    notes=(preset?preset.notes:(state.custom[state.instrument]||PRESETS[state.instrument][0].notes)).slice();
+    referenceIndex=clamp(referenceIndex,0,notes.length-1);referenceMidi=notes[referenceIndex];
+    renderCustom();renderStrings();updateReference();resetReading();
+  }
+  function renderCustom(){
+    const box=$('customEditor');box.hidden=state.tuning!=='custom';box.replaceChildren();if(box.hidden)return;
+    notes.forEach((midi,index)=>{const label=document.createElement('label');label.append('Corda '+(notes.length-index));const select=document.createElement('select');select.setAttribute('aria-label','Nota da corda '+(notes.length-index));for(let n=21;n<=76;n++){const option=document.createElement('option');const part=noteParts(n,'letters');option.value=String(n);option.textContent=part.name+part.octave;select.append(option);}select.value=String(midi);select.addEventListener('change',()=>{notes[index]=Number(select.value);state.custom[state.instrument]=notes.slice();tuned.clear();resetTracking();renderStrings();updateReference();saveSettings();});label.append(select);box.append(label);});
+  }
+  function renderStrings(){
+    const container=$('strings');container.replaceChildren();container.style.setProperty('--strings',notes.length);
+    const preset=PRESETS[state.instrument].find(p=>p.id===state.tuning);
+    $('tuningSubtitle').textContent=(preset?preset.name.split(' · ')[0]:'Personalizada')+' · da mais grave para a mais aguda';
+    notes.forEach((midi,index)=>{
+      const part=noteParts(midi);const button=document.createElement('button');button.type='button';button.className='string-button';button.dataset.index=String(index);button.setAttribute('aria-label','Fixar corda '+(notes.length-index)+', '+part.name+part.octave+', '+format(midiFrequency(midi))+' hertz');
+      const number=document.createElement('span');number.className='number';number.textContent='CORDA '+(notes.length-index);
+      const name=document.createElement('span');name.className='string-note';name.textContent=part.name;
+      const octave=document.createElement('span');octave.className='octave';octave.textContent=String(part.octave);
+      const hz=document.createElement('span');hz.className='hz';hz.textContent=format(midiFrequency(midi))+' Hz';
+      const check=document.createElement('span');check.className='string-check';
+      button.append(number,name,octave,hz,check);button.addEventListener('click',()=>selectString(index));container.append(button);
+    });refreshStringStates();
+  }
+  function refreshStringStates(){
+    for(const button of $('strings').children){const index=Number(button.dataset.index);const selected=selectedString===index||(selectedString===null&&lastReading?.index===index&&active);button.classList.toggle('selected',selected);button.classList.toggle('tuned',tuned.has(index));button.setAttribute('aria-pressed',String(selectedString===index));button.querySelector('.string-check').textContent=tuned.has(index)?'Afinada':selectedString===index?'Selecionada':'Solta';}
+    $('autoButton').setAttribute('aria-pressed',String(selectedString===null));$('sessionCount').textContent=tuned.size+' de '+notes.length+' afinadas';$('progressFill').style.width=(tuned.size/notes.length*100)+'%';
+  }
+  function selectString(index){
+    if(state.mode==='chromatic'){state.mode='strings';renderMode();}
+    selectedString=index;referenceIndex=index;referenceMidi=notes[index];resetTracking();resetReading();refreshStringStates();updateReference();saveSettings();
+    if((tone||referenceStarting)&&state.continuousTone)playReference();
+  }
+  function renderMode(){
+    const isChromatic=state.mode==='chromatic';$('modeStrings').setAttribute('aria-pressed',String(!isChromatic));$('modeChromatic').setAttribute('aria-pressed',String(isChromatic));
+    $('strings').hidden=isChromatic;$('stringHelp').hidden=isChromatic;$('chromaticGuide').hidden=!isChromatic;$('sessionInfo').hidden=isChromatic;$('resetSession').hidden=isChromatic;$('stringsHeading').textContent=isChromatic?'Todas as notas, no mesmo afinador':'Suas cordas';$('tuningSubtitle').hidden=isChromatic;
+    $('instrument').disabled=isChromatic;$('tuning').disabled=isChromatic;$('customEditor').hidden=isChromatic||state.tuning!=='custom';resetTracking();resetReading();
+  }
+  function resetTracking(){frequencyHistory=[];lastDetectedMidi=null;lastReading=null;lastValidTime=0;stableSince=0;stableIndex=null;hapticSent=false;}
+  function resetReading(title,hint){
+    $('noteName').textContent='—';$('noteOctave').textContent='';$('noteName').classList.toggle('solfege',state.notation==='solfege');$('frequency').textContent='— Hz';$('targetFrequency').textContent=selectedString===null||state.mode==='chromatic'?'— Hz':format(midiFrequency(notes[selectedString]))+' Hz';
+    $('stringTag').textContent=selectedString!==null&&state.mode==='strings'?'CORDA '+(notes.length-selectedString)+' SELECIONADA':active?'ESCUTANDO SEU SOM':'PRONTO PARA O SEU SOM';
+    $('noteDescription').textContent=selectedString!==null&&state.mode==='strings'?'Alvo: '+noteParts(notes[selectedString]).name+noteParts(notes[selectedString]).octave:'Toque uma corda solta para começar';
+    $('readingTitle').textContent=title||(active?'Toque uma corda':'Vamos afinar?');$('readingTitle').style.color='';$('cents').textContent='';$('readingHint').textContent=hint||(active?'Abafe as outras cordas e deixe a nota soar.':'Ative o microfone e toque uma corda por vez.');
+    $('needle').classList.remove('visible');$('meter').setAttribute('aria-valuenow','0');$('meter').setAttribute('aria-valuetext','Aguardando uma nota');updateMeterZone();
+  }
+  function updateMeterZone(){const width=state.tolerance*2;$('meterZone').style.left=(50-width/2)+'%';$('meterZone').style.right=(50-width/2)+'%';}
+  function updateReference(){
+    if(state.mode==='strings')referenceMidi=notes[referenceIndex];const part=noteParts(referenceMidi,'letters');$('referenceName').textContent=part.name+part.octave+' · '+part.solfege;$('referenceHz').textContent=format(midiFrequency(referenceMidi))+' Hz'+(state.mode==='strings'?' · corda '+(notes.length-referenceIndex):'');
+  }
+  function closestString(frequency){let index=0,distance=Infinity;notes.forEach((midi,i)=>{const delta=Math.abs(deviation(frequency,midi));if(delta<distance){distance=delta;index=i;}});return index;}
+  function handlePitch(result,epoch=micEpoch){
+    if(!active||epoch!==micEpoch||performance.now()<toneUntil)return;
+    const now=performance.now();const db=20*Math.log10(Math.max(result.rms,1e-7));lastSignalDb=db;$('signalLevel').textContent=Math.round(Math.max(-90,db))+' dB';$('confidenceValue').textContent=result.frequency&&db>=state.noiseFloor?Math.round(result.confidence*100)+'%':'—';
+    if(!result.frequency||db<state.noiseFloor||result.confidence<0.85){
+      stableSince=0;stableIndex=null;hapticSent=false;
+      if(now-lastValidTime>650){frequencyHistory=[];lastReading=null;resetReading(db>=state.noiseFloor?'Som indefinido':'Aguardando uma nota',db>=state.noiseFloor?'Toque uma corda sozinha, sem distorção.':'Toque uma corda ou aproxime o microfone.');refreshStringStates();}
+      return;
+    }
+    let midiFloat=frequencyMidi(result.frequency);
+    if(lastDetectedMidi!==null&&Math.abs(midiFloat-lastDetectedMidi)>0.7)frequencyHistory=[];
+    lastDetectedMidi=midiFloat;frequencyHistory.push(midiFloat);if(frequencyHistory.length>5)frequencyHistory.shift();
+    const sorted=frequencyHistory.slice().sort((a,b)=>a-b);midiFloat=sorted[Math.floor(sorted.length/2)];
+    const frequency=midiFrequency(midiFloat);const index=state.mode==='strings'?(selectedString??closestString(frequency)):null;const target=state.mode==='strings'?notes[index]:Math.round(midiFloat);
+    const cents=(midiFloat-target)*100;const actual=noteParts(Math.round(midiFloat));const near=Math.abs(cents)<=state.tolerance;const far=Math.abs(cents)>100;lastValidTime=now;lastReading={frequency,index,target,cents};
+    $('noteName').textContent=actual.name;$('noteName').classList.toggle('solfege',state.notation==='solfege');$('noteOctave').textContent=String(actual.octave);$('frequency').textContent=format(frequency)+' Hz';$('targetFrequency').textContent=format(midiFrequency(target))+' Hz';
+    $('stringTag').textContent=state.mode==='chromatic'?'MODO CROMÁTICO':'CORDA '+(notes.length-index)+' · '+(selectedString===null?'AUTOMÁTICO':'FIXA');
+    const targetPart=noteParts(target);$('noteDescription').textContent=state.mode==='chromatic'?actual.solfege:'Alvo: '+targetPart.name+targetPart.octave+' · '+targetPart.solfege;
+    const color=near?'var(--good)':cents<0?'var(--flat)':'var(--sharp)';$('meter').style.setProperty('--pointer',(50+clamp(cents,-50,50))+'%');$('meter').style.setProperty('--meter-color',color);$('needle').classList.add('visible');
+    $('meter').setAttribute('aria-valuenow',String(Math.round(clamp(cents,-50,50))));$('meter').setAttribute('aria-valuetext',format(cents,1)+' cents em relação ao alvo');$('cents').textContent=(cents>0?'+':'')+format(cents,1)+' ct';$('readingTitle').style.color=color;
+    let title,hint;
+    if(near){title='No ponto!';hint='Mantenha a nota estável por um instante.';}
+    else if(far){title='Confira a corda';const octave=Math.round(midiFloat)-target;hint=Math.abs(octave)===12?'A nota está uma oitava '+(octave>0?'acima':'abaixo')+' do alvo. Confira a corda e toque de novo.':'A nota está distante do alvo. Confira a corda antes de ajustar.';}
+    else if(cents<0){title='Abaixo do alvo';hint='Aperte a tarraxa aos poucos para subir o tom.';}
+    else{title='Acima do alvo';hint='Solte a tarraxa aos poucos para baixar o tom.';}
+    $('readingTitle').textContent=title;$('readingHint').textContent=hint;
+    if(near&&frequencyHistory.length>=3){
+      const stabilityKey=state.mode==='strings'?index:target;
+      if(stableIndex!==stabilityKey){stableIndex=stabilityKey;stableSince=now;hapticSent=false;}
+      if(now-stableSince>=550){
+        $('readingHint').textContent='Afinada. Pode seguir para a próxima corda.';
+        if(state.mode==='strings')tuned.add(index);
+        if(!hapticSent){if(state.haptic&&navigator.vibrate)navigator.vibrate(45);hapticSent=true;announce(actual.name+actual.octave+' afinada');}
+      }
+    }else{stableSince=0;stableIndex=null;hapticSent=false;announce(actual.name+actual.octave+', '+title.toLowerCase());}
+    if(state.mode==='strings'){referenceIndex=index;referenceMidi=notes[index];}else referenceMidi=target;updateReference();refreshStringStates();
+  }
+
+  function setupWorker(){
+    if(!('Worker' in window)||!('Blob' in window))return;
+    let url;
+    try{const code="'use strict';\n"+PitchDetector.toString()+"\nconst detector=new PitchDetector();self.onmessage=function(event){const d=event.data;try{self.postMessage({result:detector.detect(new Float32Array(d.buffer),d.sampleRate),epoch:d.epoch});}catch(error){self.postMessage({error:String(error),epoch:d.epoch});}};";
+      url=URL.createObjectURL(new Blob([code],{type:'text/javascript'}));worker=new Worker(url);URL.revokeObjectURL(url);
+      worker.onmessage=event=>{workerBusy=false;if(event.data.error){worker.terminate();worker=null;}else handlePitch(event.data.result,event.data.epoch);};
+      worker.onerror=()=>{if(worker)worker.terminate();worker=null;workerBusy=false;};
+    }catch(e){if(url)URL.revokeObjectURL(url);worker=null;}
+  }
+  async function ensureAudio(){
+    const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)throw new Error('Este navegador não oferece Web Audio. Abra o afinador em um navegador atualizado.');
+    if(!audio||audio.state==='closed')audio=new Audio({latencyHint:'interactive'});
+    if(audio.state!=='running')await audio.resume();return audio;
+  }
+  function micError(error){
+    const messages={NotAllowedError:'O acesso ao microfone foi bloqueado. Permita o microfone nas configurações deste site e tente novamente. Em uma prévia ou dentro de outro app, abra a página diretamente no navegador.',PermissionDeniedError:'Permita o microfone nas configurações deste site e tente novamente.',NotFoundError:'Nenhum microfone foi encontrado. Conecte um microfone ou confira as configurações do dispositivo.',DevicesNotFoundError:'Nenhum microfone foi encontrado.',NotReadableError:'Não foi possível abrir o microfone. Feche outros aplicativos que estejam usando o áudio e tente novamente.',TrackStartError:'Outro aplicativo pode estar usando o microfone. Feche-o e tente novamente.',OverconstrainedError:'O microfone selecionado não está disponível. Escolha o microfone padrão e tente novamente.',SecurityError:'O navegador bloqueou o microfone. Use HTTPS ou localhost e abra a página diretamente.',AbortError:'A abertura do microfone foi interrompida. Tente novamente.'};
+    return messages[error.name]||error.message||'Não foi possível ativar o microfone neste dispositivo.';
+  }
+  function updateMicUI(){
+    $('micButton').classList.toggle('is-listening',active);$('micStatus').classList.toggle('active',active);$('micStatusText').textContent=active?'Microfone ativo':starting?'Aguardando permissão':'Microfone desligado';$('micButtonText').textContent=active?'Parar microfone':starting?'Cancelar ativação':'Ativar microfone';$('micButtonIcon').setAttribute('href',active||starting?'#i-stop':'#i-mic');$('permissionNote').textContent=active?'Escutando ao vivo. Toque para desligar.':starting?'Autorize o microfone na janela do navegador.':'Você escolhe quando o microfone fica ligado.';
+  }
+  async function startMic(){
+    if(active||starting)return;
+    setNotice('');
+    if(!window.isSecureContext){setNotice('O microfone precisa de HTTPS ou localhost. Publique este HTML com HTTPS e abra o endereço diretamente no navegador.');return;}
+    if(!navigator.mediaDevices?.getUserMedia){setNotice('O microfone não está disponível aqui. Abra a página diretamente no Chrome, Edge, Firefox ou Safari, usando HTTPS ou localhost.');return;}
+    const epoch=++micEpoch;starting=true;updateMicUI();
+    let localStream;
+    try{
+      const contextPromise=ensureAudio();contextPromise.catch(()=>{});
+      const selected=$('inputDevice').value;
+      const constraints={channelCount:{ideal:1},echoCancellation:false,noiseSuppression:false,autoGainControl:false};if(selected)constraints.deviceId={exact:selected};
+      localStream=await navigator.mediaDevices.getUserMedia({audio:constraints,video:false});
+      if(epoch!==micEpoch||document.hidden){localStream.getTracks().forEach(t=>t.stop());await contextPromise.catch(()=>{});return;}
+      const context=await contextPromise;
+      if(epoch!==micEpoch||document.hidden){localStream.getTracks().forEach(t=>t.stop());return;}
+      if(context.state!=='running')await context.resume();
+      stream=localStream;source=context.createMediaStreamSource(stream);analyser=context.createAnalyser();analyser.fftSize=8192;analyser.smoothingTimeConstant=0;source.connect(analyser);
+      // Saída silenciosa mantém o grafo em processamento sem reproduzir o microfone.
+      silentOutput=context.createGain();silentOutput.gain.value=0;analyser.connect(silentOutput);silentOutput.connect(context.destination);
+      stream.getAudioTracks().forEach(track=>{track.addEventListener('ended',()=>{if(active&&epoch===micEpoch){stopMic();setNotice('O microfone foi desconectado. Confira o dispositivo e ative novamente.');}});track.addEventListener('mute',()=>{if(active)toast('O sinal do microfone foi interrompido pelo dispositivo.');});});
+      active=true;starting=false;resetTracking();resetReading();updateMicUI();announce('Microfone ativo. Toque uma corda.');lastAnalysis=0;rafId=requestAnimationFrame(tick);refreshDevices().catch(()=>{});acquireWakeLock();
+    }catch(error){
+      if(localStream)localStream.getTracks().forEach(t=>t.stop());if(epoch!==micEpoch)return;stream=null;starting=false;active=false;disconnectGraph();updateMicUI();setNotice(micError(error));if(audio&&audio.state==='running'&&!tone)audio.suspend().catch(()=>{});
+    }
+  }
+  function disconnectGraph(){for(const node of [source,analyser,silentOutput])try{node?.disconnect();}catch(e){}source=null;analyser=null;silentOutput=null;}
+  function stopMic(message){
+    ++micEpoch;active=false;starting=false;cancelAnimationFrame(rafId);rafId=0;if(stream){stream.getTracks().forEach(track=>track.stop());stream=null;}disconnectGraph();releaseWakeLock();resetTracking();updateMicUI();resetReading(message);$('signalLevel').textContent='— dB';$('confidenceValue').textContent='—';frame.fill(0);drawWaveform();refreshStringStates();
+    if(audio&&audio.state==='running'&&!tone)audio.suspend().catch(()=>{});
+  }
+  function tick(now){
+    if(!active||!analyser)return;analyser.getFloatTimeDomainData(frame);drawWaveform();
+    if(now>=toneUntil&&now-lastAnalysis>=75&&!workerBusy){lastAnalysis=now;if(worker){workerBusy=true;const copy=frame.slice();worker.postMessage({buffer:copy.buffer,sampleRate:audio.sampleRate,epoch:micEpoch},[copy.buffer]);}else handlePitch(detector.detect(frame,audio.sampleRate));}
+    rafId=requestAnimationFrame(tick);
+  }
+  async function refreshDevices(){
+    if(!navigator.mediaDevices?.enumerateDevices)return;
+    const devices=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');const select=$('inputDevice');const chosen=stream?.getAudioTracks()[0]?.getSettings()?.deviceId||select.value;
+    select.replaceChildren();const defaultOption=document.createElement('option');defaultOption.value='';defaultOption.textContent='Padrão do dispositivo';select.append(defaultOption);
+    devices.filter(d=>d.deviceId&&d.deviceId!=='default').forEach((device,index)=>{const option=document.createElement('option');option.value=device.deviceId;option.textContent=device.label||'Microfone '+(index+1);select.append(option);});if([...select.options].some(o=>o.value===chosen))select.value=chosen;select.disabled=false;
+  }
+  async function acquireWakeLock(){
+    if(!active||!state.wakeLock||!navigator.wakeLock||document.hidden||screenLock)return;const request=++wakeRequest;
+    try{const lock=await navigator.wakeLock.request('screen');if(!active||!state.wakeLock||document.hidden||request!==wakeRequest){await lock.release();return;}screenLock=lock;lock.addEventListener('release',()=>{if(screenLock===lock)screenLock=null;});}
+    catch(e){$('wakeHint').textContent='O dispositivo não permitiu manter a tela acesa';}
+  }
+  function releaseWakeLock(){++wakeRequest;if(screenLock){screenLock.release().catch(()=>{});screenLock=null;}}
+  function resizeCanvas(){const canvas=$('waveform');const rect=canvas.getBoundingClientRect();const ratio=Math.min(window.devicePixelRatio||1,2);canvasWidth=Math.max(1,Math.round(rect.width*ratio));canvasHeight=Math.max(1,Math.round(rect.height*ratio));canvas.width=canvasWidth;canvas.height=canvasHeight;canvasContext=canvas.getContext('2d');drawWaveform();}
+  function drawWaveform(){
+    if(!canvasContext)return;const ctx=canvasContext,w=canvasWidth,h=canvasHeight;const styles=getComputedStyle(document.documentElement);ctx.clearRect(0,0,w,h);ctx.strokeStyle=styles.getPropertyValue(active?'--accent':'--line').trim();ctx.lineWidth=Math.max(1,(window.devicePixelRatio||1));ctx.beginPath();const step=Math.max(1,Math.floor(512/w));
+    for(let px=0;px<w;px++){const sample=active&&performance.now()>=toneUntil?frame[Math.min(frame.length-1,px*step)]:0;const y=h/2+clamp(sample*3,-1,1)*(h*.42);if(px===0)ctx.moveTo(px,y);else ctx.lineTo(px,y);}ctx.stroke();
+  }
+  function setToneUI(playing){$('toneButton').classList.toggle('playing',playing);$('toneButton').setAttribute('aria-pressed',String(playing));$('toneButton').setAttribute('aria-label',playing?'Parar nota de referência':'Ouvir nota de referência');$('toneIcon').setAttribute('href',playing?'#i-stop':'#i-play');}
+  function stopReference(){
+    ++referenceEpoch;referenceStarting=false;
+    const previous=tone;tone=null;if(previous){clearTimeout(previous.timer);try{const now=previous.context.currentTime;previous.gain.gain.cancelScheduledValues(now);previous.gain.gain.setTargetAtTime(0,now,.012);previous.oscillators.forEach(osc=>osc.stop(now+.05));setTimeout(()=>{previous.oscillators.forEach(osc=>{try{osc.disconnect();}catch(e){}});try{previous.gain.disconnect();}catch(e){}},100);}catch(e){}}
+    toneUntil=performance.now()+350;setToneUI(false);resetTracking();if(active)resetReading('Voltando a escutar','Toque sua corda após o som de referência.');
+  }
+  async function playReference(){
+    stopReference();const epoch=++referenceEpoch;referenceStarting=true;setToneUI(true);
+    try{
+      const context=await ensureAudio();if(epoch!==referenceEpoch||document.hidden)return;referenceStarting=false;const frequency=midiFrequency(referenceMidi);const gain=context.createGain();gain.gain.value=0;gain.connect(context.destination);
+      const oscillator=context.createOscillator();oscillator.type='triangle';oscillator.frequency.value=frequency;oscillator.connect(gain);const now=context.currentTime;gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime(state.volume/100*.35,now+.04);oscillator.start(now);
+      const current={context,gain,oscillators:[oscillator],timer:null};tone=current;toneUntil=Infinity;setToneUI(true);resetTracking();if(active){resetReading('Som de referência','A leitura volta quando a referência parar.');$('signalLevel').textContent='Pausado';$('confidenceValue').textContent='—';}
+      if(!state.continuousTone){current.timer=setTimeout(()=>{if(tone===current)stopReference();},2200);}
+    }catch(e){if(epoch===referenceEpoch){referenceStarting=false;setToneUI(false);setNotice(micError(e));}}
+  }
+  function toggleReference(){if(tone||referenceStarting)stopReference();else playReference();}
+  function changeCalibration(value){state.calibration=clamp(Number(value)||440,430,450);state.calibration=Math.round(state.calibration*10)/10;$('calibration').value=String(state.calibration);$('calibrationLabel').textContent=format(state.calibration,state.calibration%1?1:0)+' Hz';tuned.clear();resetTracking();renderStrings();resetReading();updateReference();saveSettings();if(tone&&state.continuousTone)playReference();}
+  function changeTuning(){stopReference();selectedString=null;referenceIndex=0;tuned.clear();resetTracking();renderTunings();saveSettings();}
+  function openHelp(){const dialog=$('helpDialog');if(typeof dialog.showModal==='function')dialog.showModal();else{dialog.setAttribute('open','');dialog.scrollIntoView();}}
+  function closeHelp(){const dialog=$('helpDialog');if(typeof dialog.close==='function')dialog.close();else dialog.removeAttribute('open');}
+  function bindEvents(){
+    $('micButton').addEventListener('click',()=>active||starting?stopMic():startMic());$('toneButton').addEventListener('click',toggleReference);
+    $('modeStrings').addEventListener('click',()=>{state.mode='strings';stopReference();renderMode();updateReference();saveSettings();});$('modeChromatic').addEventListener('click',()=>{state.mode='chromatic';stopReference();renderMode();updateReference();saveSettings();});
+    $('instrument').addEventListener('change',()=>{state.instrument=$('instrument').value;state.tuning='standard';changeTuning();});$('tuning').addEventListener('change',()=>{state.tuning=$('tuning').value;changeTuning();});
+    $('autoButton').addEventListener('click',()=>{selectedString=null;resetTracking();resetReading();refreshStringStates();});
+    $('resetSession').addEventListener('click',()=>{tuned.clear();stableSince=0;stableIndex=null;hapticSent=false;refreshStringStates();toast('Nova sessão. Pode começar pela corda mais grave.');});
+    $('calibration').addEventListener('change',()=>changeCalibration($('calibration').value));$('calibrationDown').addEventListener('click',()=>changeCalibration(state.calibration-1));$('calibrationUp').addEventListener('click',()=>changeCalibration(state.calibration+1));
+    $('tolerance').addEventListener('change',()=>{state.tolerance=Number($('tolerance').value);tuned.clear();resetTracking();resetReading();refreshStringStates();saveSettings();});
+    $('noiseFloor').addEventListener('input',()=>{state.noiseFloor=Number($('noiseFloor').value);$('noiseLabel').textContent=state.noiseFloor+' dB';saveSettings();});
+    for(const id of ['notation','accidental'])$(id).addEventListener('change',()=>{state[id]=$(id).value;renderCustom();renderStrings();resetTracking();resetReading();updateReference();saveSettings();});
+    $('volume').addEventListener('input',()=>{state.volume=Number($('volume').value);$('volumeLabel').textContent=state.volume+'%';if(tone)tone.gain.gain.setTargetAtTime(state.volume/100*.35,tone.context.currentTime,.04);saveSettings();});
+    $('continuousTone').addEventListener('change',()=>{state.continuousTone=$('continuousTone').checked;saveSettings();if(tone)playReference();});
+    $('haptic').addEventListener('change',()=>{state.haptic=$('haptic').checked;saveSettings();});$('wakeLock').addEventListener('change',()=>{state.wakeLock=$('wakeLock').checked;saveSettings();if(state.wakeLock)acquireWakeLock();else releaseWakeLock();});
+    $('inputDevice').addEventListener('change',()=>{if(active||starting){stopMic();startMic();}});
+    $('themeButton').addEventListener('click',()=>{state.theme=state.theme==='dark'?'light':'dark';applyTheme();saveSettings();});
+    for(const id of ['helpButton','footerHelp'])$(id).addEventListener('click',openHelp);$('closeHelp').addEventListener('click',closeHelp);
+    $('helpDialog').addEventListener('click',event=>{if(event.target===$('helpDialog')){const r=$('helpDialog').getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeHelp();}});
+    $('resetSettings').addEventListener('click',()=>{stopReference();releaseWakeLock();state={...DEFAULTS,custom:{}};selectedString=null;referenceIndex=0;tuned.clear();resetTracking();initializeControls();saveSettings();if(active)acquireWakeLock();toast('Ajustes padrão restaurados.');});
+    document.addEventListener('keydown',event=>{if(event.altKey||event.ctrlKey||event.metaKey||event.repeat)return;const tag=event.target?.tagName;if(['INPUT','SELECT','TEXTAREA','BUTTON'].includes(tag)||event.target?.isContentEditable)return;if($('helpDialog').open){if(event.key==='Escape')stopReference();return;}if(event.code==='Space'){event.preventDefault();active||starting?stopMic():startMic();}else if(event.key.toLowerCase()==='r'){event.preventDefault();toggleReference();}else if(event.key==='Escape'){stopReference();}else if(['ArrowLeft','ArrowRight'].includes(event.key)&&state.mode==='strings'){event.preventDefault();selectString(clamp((selectedString??referenceIndex)+(event.key==='ArrowRight'?1:-1),0,notes.length-1));}});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden){stopReference();if(active||starting)stopMic('Microfone pausado');}});
+    window.addEventListener('pagehide',()=>{stopReference();stopMic();if(audio)audio.close().catch(()=>{});});
+    window.addEventListener('resize',resizeCanvas);navigator.mediaDevices?.addEventListener?.('devicechange',()=>refreshDevices().catch(()=>{}));
+  }
+  initializeControls();bindEvents();resizeCanvas();setupWorker();
+  if(!window.isSecureContext)setNotice('Para usar o microfone, abra este arquivo em HTTPS ou localhost. Os sons de referência continuam disponíveis.');
+  </script>
+</body>
+</html>
